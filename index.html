@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ReadTrack – Personal Reading Analytics</title>
+<style>
+:root{--bg:#f4f5fb;--card:rgba(255,255,255,.8);--tx:#141833;--mu:#6b7194;--bd:rgba(20,24,51,.09);--pr:#6d4aff;--pr2:#3b5bff;--ok:#16a34a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#070a1a;--card:rgba(24,29,64,.65);--tx:#eef0ff;--mu:#9aa1cf;--bd:rgba(255,255,255,.09)}}
+:root[data-theme="dark"]{--bg:#070a1a;--card:rgba(24,29,64,.65);--tx:#eef0ff;--mu:#9aa1cf;--bd:rgba(255,255,255,.09)}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans Thai',Roboto,Arial,sans-serif}
+#hero{position:relative;height:100dvh;width:100%;overflow:hidden;background:radial-gradient(circle at 30% 20%,#2a1f7a,#05070d 70%);touch-action:none}
+#hero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s;pointer-events:none}
+#hero .ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 6%;pointer-events:none;color:#f2f4f8}
+#hT{font-weight:800;font-size:clamp(30px,7vw,96px);letter-spacing:-.02em;text-shadow:0 4px 30px rgba(0,0,0,.5)}
+#hG{opacity:0;font-weight:700;font-size:clamp(20px,3.4vw,40px)}
+#hH{position:absolute;left:50%;bottom:clamp(20px,6vh,48px);transform:translateX(-50%);color:#f0f4f8bf;font-size:12px;font-weight:600;letter-spacing:.3em;text-align:center;transition:opacity .4s}
+#hP{position:absolute;left:0;right:0;bottom:0;height:2px;background:#ffffff1f}#hPi{height:100%;background:#fff;transform:scaleX(0);transform-origin:left}
+#skip{position:absolute;top:calc(16px + env(safe-area-inset-top,0px));right:16px;z-index:3;background:#ffffff22;color:#fff;border:1px solid #ffffff44;border-radius:99px;padding:8px 16px;cursor:pointer;backdrop-filter:blur(8px)}
+#sig{position:absolute;right:16px;bottom:12px;font-size:12px;color:#dce0e899}
+#app{display:flex;min-height:100dvh}
+nav{width:220px;padding:20px 12px;border-right:1px solid var(--bd);position:sticky;top:0;height:100dvh;background:var(--card);backdrop-filter:blur(14px);display:flex;flex-direction:column;gap:4px}
+nav b{font-size:20px;padding:6px 12px 16px;background:linear-gradient(90deg,var(--pr),var(--pr2));-webkit-background-clip:text;color:transparent}
+nav button{all:unset;cursor:pointer;padding:10px 12px;border-radius:12px;color:var(--mu);font-size:14px}
+nav button.on,nav button:hover{background:linear-gradient(90deg,#6d4aff26,#3b5bff1a);color:var(--tx)}
+main{flex:1;padding:24px;max-width:1100px;margin:0 auto;width:100%;animation:up .4s}
+@keyframes up{from{opacity:0;transform:translateY(10px)}}
+.g{display:grid;gap:14px}.c4{grid-template-columns:repeat(4,1fr)}.c2{grid-template-columns:1fr 1fr}
+.card{position:relative;background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:16px;box-shadow:0 8px 30px #0000000d;backdrop-filter:blur(12px);min-width:0}
+/* Shine Border (พอร์ตจาก ShineBorder: color=["#A07CFE","#FE8FB5","#FFBE7B"]) */
+.card::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;background-image:radial-gradient(transparent,transparent,#A07CFE,#FE8FB5,#FFBE7B,transparent,transparent);background-size:300% 300%;-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;animation:shine 14s linear infinite;will-change:background-position}
+@keyframes shine{0%{background-position:0% 0%}50%{background-position:100% 100%}to{background-position:0% 0%}}
+@media(prefers-reduced-motion:reduce){.card::before{animation:none}}
+.card small{color:var(--mu);display:block;margin-bottom:6px}.card .v{font-size:24px;font-weight:700}
+h2{margin:0 0 14px}h3{margin:0 0 10px;font-size:15px}
+.btn{background:linear-gradient(90deg,var(--pr),var(--pr2));color:#fff;border:0;border-radius:12px;padding:10px 18px;cursor:pointer;font-size:14px;font-weight:600}
+.btn.s{background:var(--card);color:var(--tx);border:1px solid var(--bd)}
+.chip{border:1px solid var(--bd);background:var(--card);color:var(--mu);border-radius:99px;padding:6px 12px;cursor:pointer;font-size:13px}.chip.on{background:var(--pr);color:#fff;border-color:var(--pr)}
+input,select,textarea{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:9px 10px;font:inherit;margin-bottom:8px}
+label{font-size:12px;color:var(--mu)}
+.bar{height:8px;border-radius:9px;background:var(--bd);overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--pr),var(--pr2));transition:width .6s}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--bd)}
+.wrap{overflow-x:auto}.demo{background:#f59e0b26;border:1px solid #f59e0b66;border-radius:14px;padding:10px 14px;margin-bottom:14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.heat{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,12px);gap:3px;overflow-x:auto}.heat i{width:12px;height:12px;border-radius:3px;background:var(--bd)}
+.clock{font-size:64px;font-weight:800;text-align:center;font-variant-numeric:tabular-nums;margin:10px 0}
+.modal{position:fixed;inset:0;background:#0009;display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}.modal>div{background:var(--bg);border-radius:20px;padding:20px;width:100%;max-width:460px;max-height:90dvh;overflow:auto;border:1px solid var(--bd)}
+#focus{position:fixed;inset:0;z-index:40;background:radial-gradient(circle at 50% 30%,#241a6b,#05070d);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+#toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:60;display:flex;flex-direction:column;gap:8px}#toast div{background:linear-gradient(90deg,var(--pr),var(--pr2));color:#fff;padding:10px 18px;border-radius:14px;animation:up .4s}
+.lock{opacity:.4;filter:grayscale(1)}.empty{text-align:center;padding:30px;color:var(--mu)}
+@media(max-width:800px){nav{position:fixed;bottom:0;left:0;right:0;top:auto;width:auto;height:auto;flex-direction:row;overflow-x:auto;border-right:0;border-top:1px solid var(--bd);z-index:20;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}nav b{display:none}nav button{white-space:nowrap;font-size:12px;padding:8px 10px}main{padding:16px 14px 90px}.c4{grid-template-columns:1fr 1fr}.c2{grid-template-columns:1fr}.clock{font-size:48px}}
+/* ===== Liquid Glass (ปุ่มกระจกเหลว + ธีมเดิม Navy/Purple) ===== */
+:root{--glass:rgba(255,255,255,.5);--glass-bd:rgba(255,255,255,.75);--hl:rgba(255,255,255,.95)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--glass:rgba(255,255,255,.09);--glass-bd:rgba(255,255,255,.22);--hl:rgba(255,255,255,.45)}}
+:root[data-theme="dark"]{--glass:rgba(255,255,255,.09);--glass-bd:rgba(255,255,255,.22);--hl:rgba(255,255,255,.45)}
+body{background-image:radial-gradient(60% 50% at 12% 8%,#6d4aff40,transparent),radial-gradient(50% 40% at 92% 28%,#3b5bff38,transparent),radial-gradient(50% 50% at 50% 100%,#ec489928,transparent);background-attachment:fixed}
+.btn,.chip,nav button,#skip{position:relative;overflow:hidden;isolation:isolate;display:block;-webkit-backdrop-filter:blur(14px) saturate(180%);backdrop-filter:blur(14px) saturate(180%);border:1px solid var(--glass-bd);background:var(--glass);color:var(--tx);box-shadow:inset 0 1px 1px var(--hl),inset 0 -10px 18px #ffffff0f,0 8px 24px #1b1e5a26;transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .3s,background .3s}
+.btn,.chip{display:inline-block}
+.btn::after,.chip::after,nav button::after,#skip::after{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.5) 48%,transparent 62%);transform:translateX(-120%);transition:transform .7s}
+.btn:hover::after,.chip:hover::after,nav button:hover::after,#skip:hover::after{transform:translateX(120%)}
+.btn:hover,.chip:hover,nav button:hover,#skip:hover{transform:translateY(-1px) scale(1.03)}
+.btn:active,.chip:active,nav button:active,#skip:active{transform:scale(.95)}
+.btn{background:linear-gradient(135deg,rgba(109,74,255,.8),rgba(59,91,255,.62));color:#fff;border-color:rgba(255,255,255,.42);box-shadow:inset 0 1px 1px rgba(255,255,255,.75),inset 0 -10px 18px rgba(255,255,255,.1),0 10px 28px rgba(90,70,255,.4)}
+.btn.s{background:var(--glass);color:var(--tx);box-shadow:inset 0 1px 1px var(--hl),inset 0 -10px 18px #ffffff0f,0 8px 24px #1b1e5a26}
+.chip.on{background:linear-gradient(135deg,rgba(109,74,255,.88),rgba(59,91,255,.68));color:#fff;border-color:rgba(255,255,255,.45)}
+nav button{border-radius:14px;border-color:transparent;box-shadow:none;background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}
+nav button:hover,nav button.on{border-color:var(--glass-bd);background:linear-gradient(135deg,rgba(109,74,255,.3),rgba(59,91,255,.18));box-shadow:inset 0 1px 1px var(--hl),0 6px 18px #1b1e5a22;color:var(--tx)}
+#skip{color:#fff;background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.4)}
+@media(prefers-reduced-motion:reduce){.btn,.chip,nav button,#skip{transition:none}.btn::after,.chip::after,nav button::after,#skip::after{display:none}}
+/* ===== Night Mode (โทนอบอุ่น ลดแสงสีฟ้า ถนอมสายตาตอนกลางคืน) ===== */
+:root[data-theme="night"]{--bg:#0a0705;--card:rgba(34,23,15,.62);--tx:#f1dfc8;--mu:#b39a7d;--bd:rgba(255,200,140,.11);--pr:#e0913a;--pr2:#c2571f;--glass:rgba(255,190,120,.07);--glass-bd:rgba(255,190,120,.22);--hl:rgba(255,210,160,.35);color-scheme:dark}
+:root[data-theme="night"] body{background-image:radial-gradient(60% 50% at 12% 8%,#e0913a1f,transparent),radial-gradient(50% 40% at 92% 28%,#c2571f1a,transparent),radial-gradient(50% 50% at 50% 100%,#8f4a1a1a,transparent)}
+:root[data-theme="night"] .card::before{background-image:radial-gradient(transparent,transparent,#e0913a,#f4c27a,#c2571f,transparent,transparent)}
+:root[data-theme="night"] .btn,:root[data-theme="night"] .chip.on{background:linear-gradient(135deg,rgba(224,145,58,.82),rgba(194,87,31,.66));color:#fff8ee;border-color:rgba(255,220,170,.4);box-shadow:inset 0 1px 1px rgba(255,225,180,.6),inset 0 -10px 18px rgba(255,200,140,.08),0 10px 28px rgba(194,87,31,.35)}
+:root[data-theme="night"] .btn.s{background:var(--glass);color:var(--tx);box-shadow:inset 0 1px 1px var(--hl),0 8px 24px #00000055}
+:root[data-theme="night"] nav button:hover,:root[data-theme="night"] nav button.on{background:linear-gradient(135deg,rgba(224,145,58,.28),rgba(194,87,31,.16))}
+:root[data-theme="night"] nav b{background:linear-gradient(90deg,#f4c27a,#e0913a);-webkit-background-clip:text;color:transparent}
+:root[data-theme="night"] #focus{background:radial-gradient(circle at 50% 30%,#3a1f0c,#050302)}
+:root[data-theme="night"] .demo{background:#e0913a22;border-color:#e0913a66}
+</style></head><body>
+<section id="hero"><video id="hv" muted playsinline preload="auto"></video>
+<div class="ov"><span id="hT"></span></div><div class="ov"><span id="hG"></span></div>
+<div id="hH"><div id="hHt"></div>↓</div><button id="skip">Skip ›</button><span id="sig"></span>
+<div id="hP"><div id="hPi"></div></div></section>
+<div id="app"><nav id="nav"></nav><main id="main"></main></div>
+<div id="toast"></div><div id="ov"></div>
+<script>
+// ===== CONFIG (เปลี่ยน video/ข้อความได้ที่นี่ที่เดียว) =====
+const HERO={videoSrc:"https://cdn.21st.dev/assets/mirror/21/21a77eac28eacbb7e142016eefeaa0b4a766619e51113629a3bc6df6af066c0f.mp4",title:"READ. FOCUS. GROW.",scrollHint:"START READING",tagline:"",signature:{name:"ReadTrack",url:"#"},scrubDistance:3200};
+const $=s=>document.querySelector(s),clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+// ===== storage =====
+const K="readtrack.v1";let mem=null;
+const load=()=>{try{const r=localStorage.getItem(K);if(r)return JSON.parse(r)}catch(e){}return mem};
+const persist=()=>{mem=S;try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+const dk=d=>{d=new Date(d);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const DAY=864e5,SUBJ=["Mathematics","English","Science","Thai"];
+function seed(){let x=7;const r=()=>(x=(x*9301+49297)%233280)/233280;const ss=[],now=Date.now();
+ for(let d=0;d<60;d++){if(d>7&&r()<.3)continue;const n=1+(r()<.4);for(let k=0;k<n;k++){const t=new Date(now-d*DAY);t.setHours(k?19:17+Math.floor(r()*3),0,0,0);const dur=Math.round(25+r()*70);
+ ss.push({id:"d"+d+k,date:dk(t),start:t.getTime(),end:t.getTime()+dur*6e4,dur,subject:SUBJ[Math.floor(r()*4)],book:["Calculus Basic","English Grammar","Physics Basic"][Math.floor(r()*3)],topic:"Demo",pages:Math.round(8+r()*20),focus:3+Math.round(r()*2),mood:"😊",note:"",demo:1})}}
+ return ss}
+let S=load()||{theme:null,demo:true,sessions:seed(),books:[{id:"b1",title:"Calculus Basic",author:"Demo",subject:"Mathematics",cat:"Textbook",total:300,last:120},{id:"b2",title:"English Grammar",author:"Demo",subject:"English",cat:"Language",total:200,last:80},{id:"b3",title:"Physics Basic",author:"Demo",subject:"Science",cat:"Textbook",total:300,last:120}],goals:[{id:"g1",type:"daily",target:120},{id:"g2",type:"total",target:100}],ach:[]};
+// ===== statistics / goals / achievements =====
+const fm=m=>{m=Math.round(m);return m<60?m+"m":Math.floor(m/60)+"h "+String(m%60).padStart(2,"0")+"m"};
+const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0);
+const RANGES=[["7 Days",7],["30 Days",30],["3 Months",90],["6 Months",180],["1 Year",365],["All Time",0]];let RG=30;
+const inRange=(n)=>n?S.sessions.filter(s=>s.start>=Date.now()-n*DAY):S.sessions;
+function streaks(){const ds=[...new Set(S.sessions.map(s=>s.date))].sort();let lg=0,run=0,prev=null;
+ ds.forEach(d=>{run=prev&&(new Date(d)-new Date(prev))/DAY===1?run+1:1;lg=Math.max(lg,run);prev=d});
+ const set=new Set(ds);let cur=0,t=new Date();if(!set.has(dk(t)))t=new Date(Date.now()-DAY);
+ while(set.has(dk(t))){cur++;t=new Date(t-DAY)}return{cur,lg}}
+const byDay=d=>sum(S.sessions.filter(s=>s.date===dk(d)),s=>s.dur);
+function agg(ss){const m={};ss.forEach(s=>m[s.subject]=(m[s.subject]||0)+s.dur);return Object.entries(m).sort((a,b)=>b[1]-a[1])}
+function goalProg(g){let c=0;const st=streaks();
+ if(g.type==="daily")c=byDay(new Date());
+ if(g.type==="weekly")c=sum(S.sessions.filter(s=>s.start>=Date.now()-7*DAY),s=>s.dur);
+ if(g.type==="total")c=sum(S.sessions,s=>s.dur)/60;
+ if(g.type==="streak")c=st.cur;
+ if(g.type==="subject")c=sum(S.sessions.filter(s=>s.subject===g.subject),s=>s.dur)/60;
+ const unit=g.type==="daily"||g.type==="weekly"?"min":g.type==="streak"?"days":"h";
+ const name={daily:`อ่านวันละ ${g.target} นาที`,weekly:`อ่านสัปดาห์ละ ${g.target} นาที`,total:`อ่านครบ ${g.target} ชั่วโมง`,streak:`อ่าน ${g.target} วันติดต่อกัน`,subject:`อ่าน ${g.subject} ${g.target} ชั่วโมง`}[g.type];
+ return{name,c:Math.round(c*10)/10,unit,pct:Math.min(100,Math.round(c/g.target*100))}}
+const ACH=[["first","🏅","First Session","อ่านหนังสือครั้งแรก",()=>S.sessions.length>0],["s7","🔥","7 Day Streak","อ่านติดต่อกัน 7 วัน",()=>streaks().lg>=7],["h50","📚","Book Lover","อ่านครบ 50 ชั่วโมง",()=>sum(S.sessions,s=>s.dur)>=3000],["focus","⏱","Focus Master","Session เดียวเกิน 2 ชั่วโมง",()=>S.sessions.some(s=>s.dur>120)],["goal","🎯","Goal Crusher","ทำเป้าหมายสำเร็จ",()=>S.goals.some(g=>goalProg(g).pct>=100)],["h100","🏆","100 Hours","อ่านครบ 100 ชั่วโมง",()=>sum(S.sessions,s=>s.dur)>=6000]];
+function checkAch(){ACH.forEach(a=>{if(!S.ach.includes(a[0])&&a[4]()){S.ach.push(a[0]);toast(`${a[1]} ปลดล็อก: ${a[2]}!`)}})}
+function insights(){const ss=S.sessions;if(ss.length<3)return["เริ่มอ่านหนังสือเพื่อให้ระบบวิเคราะห์พฤติกรรมของคุณ"];const o=[];
+ const w1=sum(ss.filter(s=>s.start>=Date.now()-7*DAY),s=>s.dur),w0=sum(ss.filter(s=>s.start<Date.now()-7*DAY&&s.start>=Date.now()-14*DAY),s=>s.dur);
+ if(w0>0){const p=Math.round((w1-w0)/w0*100);o.push(`สัปดาห์นี้คุณอ่านหนังสือ${p>=0?"มากกว่า":"น้อยกว่า"}สัปดาห์ก่อน ${Math.abs(p)}%`)}
+ const h=Array(24).fill(0);ss.forEach(s=>h[new Date(s.start).getHours()]+=s.dur);let bi=0,bv=0;for(let i=0;i<24;i++){const v=h[i]+h[(i+1)%24];if(v>bv){bv=v;bi=i}}
+ o.push(`คุณมักอ่านหนังสือในช่วง ${String(bi).padStart(2,"0")}:00–${String((bi+2)%24).padStart(2,"0")}:00`);
+ o.push(`วิชาที่คุณใช้เวลาอ่านมากที่สุดคือ ${agg(ss)[0][0]}`);
+ const days=Math.max(1,Math.ceil((Date.now()-Math.min(...ss.map(s=>s.start)))/DAY));o.push(`ค่าเฉลี่ยการอ่านต่อวันคือ ${fm(sum(ss,s=>s.dur)/days)}`);
+ const st=streaks();if(st.cur>0)o.push(`คุณอ่านหนังสือติดต่อกันมาแล้ว ${st.cur} วัน`);return o}
+// ===== charts (SVG) =====
+function line(){const n=RG===7?7:RG===30?30:RG===90?13:RG===180?26:52,b=RG<=30&&RG>0?1:7,pts=[];
+ for(let i=n-1;i>=0;i--){const e=Date.now()-i*b*DAY,st=e-b*DAY;pts.push(sum(S.sessions.filter(s=>s.start>st&&s.start<=e),s=>s.dur)/60)}
+ const mx=Math.max(1,...pts),W=600,H=180,px=i=>20+i*(W-40)/Math.max(1,n-1),py=v=>H-20-v/mx*(H-40);
+ const d=pts.map((v,i)=>(i?"L":"M")+px(i).toFixed(1)+" "+py(v).toFixed(1)).join(" ");
+ return`<svg viewBox="0 0 ${W} ${H}" width="100%"><defs><linearGradient id="lg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" style="stop-color:var(--pr)" stop-opacity=".35"/><stop offset="1" style="stop-color:var(--pr)" stop-opacity="0"/></linearGradient></defs><path d="${d} L${px(n-1)} ${H-20} L${px(0)} ${H-20}Z" fill="url(#lg)"/><path d="${d}" fill="none" style="stroke:var(--pr)" stroke-width="3" stroke-linecap="round"/><text x="20" y="14" fill="var(--mu)" font-size="11">max ${mx.toFixed(1)}h / ${b===1?"day":"week"}</text></svg>`}
+const COLS_D=["#6d4aff","#3b5bff","#06b6d4","#f59e0b","#ec4899","#10b981"],COLS_N=["#e0913a","#c2571f","#d9b26f","#a86a3d","#e8c39a","#8f6b4a"];let COLS=COLS_D;
+function bars(a){if(!a.length)return'<div class="empty">ไม่มีข้อมูล</div>';const mx=a[0][1];return a.slice(0,6).map((x,i)=>`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:13px"><span>${x[0]}</span><span>${fm(x[1])}</span></div><div class="bar"><i style="width:${x[1]/mx*100}%;background:${COLS[i]}"></i></div></div>`).join("")}
+function donut(a){const t=sum(a,x=>x[1]);if(!t)return'<div class="empty">ไม่มีข้อมูล</div>';let acc=0;const r=50,C=2*Math.PI*r;
+ const seg=a.slice(0,6).map((x,i)=>{const l=x[1]/t*C,s=`<circle r="${r}" cx="70" cy="70" fill="none" stroke="${COLS[i]}" stroke-width="22" stroke-dasharray="${l} ${C-l}" stroke-dashoffset="${-acc}" transform="rotate(-90 70 70)"/>`;acc+=l;return s}).join("");
+ return`<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><svg viewBox="0 0 140 140" width="140">${seg}<text x="70" y="75" text-anchor="middle" fill="var(--tx)" font-weight="700">${fm(t)}</text></svg><div style="font-size:12px">${a.slice(0,6).map((x,i)=>`<div><span style="color:${COLS[i]}">●</span> ${x[0]} ${Math.round(x[1]/t*100)}%</div>`).join("")}</div></div>`}
+function heat(){const cells=[],today=new Date(),start=new Date(today-(19*7+today.getDay())*DAY);
+ for(let i=0;i<20*7;i++){const d=new Date(+start+i*DAY);if(d>today)break;const m=byDay(d),o=m===0?0:m<30?.3:m<60?.55:m<120?.8:1;cells.push(`<i title="${dk(d)}: ${fm(m)}" style="${o?`background:var(--pr);opacity:${o}`:""}"></i>`)}
+ return`<div class="heat">${cells.join("")}</div>`}
+// ===== UI =====
+const NAV=[["dash","Dashboard"],["timer","Timer"],["books","My Books"],["hist","History"],["stats","Statistics"],["goals","Goals"],["ach","Achievements"],["ins","Insights"],["set","Settings"]];
+let V="dash",F={q:"",sub:"",foc:""};
+function toast(t){const e=document.createElement("div");e.textContent=t;$("#toast").append(e);setTimeout(()=>e.remove(),3500)}
+const card=(l,v,x="")=>`<div class="card"><small>${l}</small><div class="v">${v}</div>${x}</div>`;
+const chips=()=>`<div class="row">${RANGES.map(r=>`<button class="chip ${r[1]===RG?"on":""}" data-a="rg" data-v="${r[1]}">${r[0]}</button>`).join("")}</div>`;
+function nav(){$("#nav").innerHTML="<b>📖 ReadTrack</b>"+NAV.map(n=>`<button class="${n[0]===V?"on":""}" data-a="go" data-v="${n[0]}">${n[1]}</button>`).join("")+`<button data-a="night" style="margin-top:auto">${document.documentElement.dataset.theme==="night"?"☀️ ออกจาก Night":"🌙 Night mode"}</button>`}
+function demoBar(){return S.demo?`<div class="demo"><span>⚠️ <b>Demo Data</b> — ข้อมูลตัวอย่างสำหรับดูระบบ</span><button class="btn s" data-a="clear">ล้าง Demo Data & เริ่มจริง</button></div>`:""}
+const empty=`<div class="card empty">📚 ยังไม่มีข้อมูลการอ่าน<br>เริ่ม Session แรกของคุณ แล้วระบบจะเริ่มวิเคราะห์พฤติกรรมการอ่าน<br><br><button class="btn" data-a="go" data-v="timer">Start Reading</button></div>`;
+const V_={
+dash(){const ss=inRange(RG),st=streaks(),tot=sum(ss,s=>s.dur),g=S.goals.find(g=>g.type==="daily")||{target:180},td=byDay(new Date()),p=Math.min(100,Math.round(td/g.target*100));
+ if(!S.sessions.length)return demoBar()+"<h2>Dashboard</h2>"+empty;
+ return demoBar()+`<h2>Dashboard</h2>${chips()}<div class="g c4">${card("Today Reading",fm(td))}${card("Daily Goal",`${fm(td)} / ${fm(g.target)}`,`<div class="bar"><i style="width:${p}%"></i></div><small style="margin-top:4px">${p}%</small>`)}${card("Reading Streak","🔥 "+st.cur+" Days")}${card("Total Sessions",ss.length)}${card("Total Reading Time",fm(tot))}${card("Average Session",ss.length?fm(tot/ss.length):"0m")}${card("Total Pages",sum(ss,s=>s.pages).toLocaleString())}${card("Focus Score",ss.length?(sum(ss,s=>s.focus)/ss.length).toFixed(1)+" / 5":"–")}</div>
+ <div class="g c2" style="margin-top:14px"><div class="card"><h3>Reading Time</h3>${line()}</div><div class="card"><h3>Reading Insights</h3>${insights().map(t=>`<p style="margin:0 0 8px;font-size:14px">💡 ${t}</p>`).join("")}</div>
+ <div class="card"><h3>เวลาอ่านแต่ละวิชา</h3>${bars(agg(ss))}</div><div class="card"><h3>สัดส่วนวิชา</h3>${donut(agg(ss))}</div></div>
+ <div class="card" style="margin-top:14px"><h3>Heatmap – 20 สัปดาห์ล่าสุด</h3>${heat()}</div>`},
+timer(){const o=S.books.map(b=>`<option>${b.title}</option>`).join("");
+ return`<h2>Reading Timer</h2><div class="card" style="max-width:520px;margin:auto"><div class="row">${[["focus","Focus Reading"],["short","Short Break 5m"],["long","Long Break 15m"],["custom","Custom"]].map(m=>`<button class="chip ${T.mode===m[0]?"on":""}" data-a="mode" data-v="${m[0]}">${m[1]}</button>`).join("")}</div>
+ <div class="clock" id="clk">${clk()}</div>${T.mode==="custom"?`<label>Custom minutes</label><input id="cm" type="number" min="1" value="${T.custom}">`:""}
+ <label>วิชา</label><input id="tsub" list="sl" value="${T.subject}"><datalist id="sl">${[...new Set([...SUBJ,...S.books.map(b=>b.subject)])].map(s=>`<option>${s}</option>`).join("")}</datalist>
+ <label>หนังสือ</label><select id="tbk"><option value="">– ไม่ระบุ –</option>${o}</select>
+ <div class="row" style="justify-content:center;margin:0">${T.state==="idle"?`<button class="btn" data-a="start">Start</button>`:`<button class="btn s" data-a="pause">${T.state==="paused"?"Resume":"Pause"}</button><button class="btn" data-a="stop">Stop</button>`}<button class="btn s" data-a="reset">Reset</button></div></div>`},
+books(){return`<h2>My Books</h2><div class="card" style="margin-bottom:14px"><h3>เพิ่มหนังสือ</h3><div class="g c4"><div><label>ชื่อ</label><input id="bt"></div><div><label>ผู้เขียน</label><input id="ba"></div><div><label>วิชา</label><input id="bs"></div><div><label>หมวดหมู่</label><input id="bc"></div><div><label>จำนวนหน้าทั้งหมด</label><input id="bn" type="number"></div><div><label>หน้าที่อ่านล่าสุด</label><input id="bl" type="number" value="0"></div></div><button class="btn" data-a="addbook">เพิ่ม</button></div>
+ <div class="g c4">${S.books.length?S.books.map(b=>{const p=Math.min(100,Math.round(b.last/b.total*100)),t=sum(S.sessions.filter(s=>s.book===b.title),s=>s.dur);return`<div class="card"><b>${b.title}</b><small>${b.author||""} · ${b.subject}</small><div class="bar"><i style="width:${p}%"></i></div><small style="margin-top:6px">${b.last} / ${b.total} Pages · ${p}%<br>อ่านไปแล้ว ${fm(t)}</small><button class="chip" data-a="delbook" data-v="${b.id}">ลบ</button></div>`}).join(""):'<div class="empty">ยังไม่มีหนังสือ</div>'}</div>`},
+hist(){const q=F.q.toLowerCase(),ss=S.sessions.filter(s=>(!q||[s.subject,s.book,s.topic,s.note].join(" ").toLowerCase().includes(q))&&(!F.sub||s.subject===F.sub)&&(!F.foc||s.focus>=+F.foc)).sort((a,b)=>b.start-a.start).slice(0,200);
+ const subs=[...new Set(S.sessions.map(s=>s.subject))];
+ return`<h2>Reading History</h2><div class="g c4"><input id="fq" placeholder="ค้นหา…" value="${F.q}"><select id="fs"><option value="">ทุกวิชา</option>${subs.map(s=>`<option ${F.sub===s?"selected":""}>${s}</option>`).join("")}</select><select id="ff"><option value="">Focus ทั้งหมด</option>${[3,4,5].map(n=>`<option value="${n}" ${F.foc==n?"selected":""}>Focus ≥ ${n}</option>`).join("")}</select></div>
+ <div class="card wrap">${ss.length?`<table><tr><th>Date</th><th>Subject</th><th>Book</th><th>Topic</th><th>Duration</th><th>Pages</th><th>Focus</th></tr>${ss.map(s=>`<tr><td>${s.date}</td><td>${s.subject}</td><td>${s.book||"-"}</td><td>${s.topic||"-"}</td><td>${fm(s.dur)}</td><td>${s.pages}</td><td>${"⭐".repeat(s.focus)}</td></tr>`).join("")}</table>`:'<div class="empty">ไม่พบข้อมูล</div>'}</div>`},
+stats(){const ss=inRange(RG);if(!S.sessions.length)return"<h2>Statistics</h2>"+empty;const days=RG||Math.max(1,Math.ceil((Date.now()-Math.min(...S.sessions.map(s=>s.start)))/DAY));
+ return`<h2>Statistics</h2>${chips()}<div class="g c4">${card("Total Time",fm(sum(ss,s=>s.dur)))}${card("Sessions",ss.length)}${card("Avg / Day",fm(sum(ss,s=>s.dur)/days))}${card("Longest Session",fm(Math.max(0,...ss.map(s=>s.dur))))}</div><div class="card" style="margin-top:14px"><h3>Reading Time</h3>${line()}</div><div class="g c2" style="margin-top:14px"><div class="card"><h3>Bar</h3>${bars(agg(ss))}</div><div class="card"><h3>Donut</h3>${donut(agg(ss))}</div></div>`},
+goals(){const st=streaks();return`<h2>Reading Goals</h2><div class="card" style="margin-bottom:14px"><div class="g c4"><div><label>ประเภท</label><select id="gt"><option value="daily">รายวัน (นาที)</option><option value="weekly">รายสัปดาห์ (นาที)</option><option value="total">รวม (ชั่วโมง)</option><option value="streak">ติดต่อกัน (วัน)</option><option value="subject">รายวิชา (ชั่วโมง)</option></select></div><div><label>เป้าหมาย</label><input id="gv" type="number" value="10"></div><div><label>วิชา (ถ้าเลือกรายวิชา)</label><input id="gs"></div></div><button class="btn" data-a="addgoal">สร้างเป้าหมาย</button></div>
+ <div class="card" style="margin-bottom:14px">🔥 Current Streak <b>${st.cur} Days</b> · 🏆 Longest <b>${st.lg} Days</b> ${byDay(new Date())>0?'· ✓ Completed วันนี้':''}<div style="margin-top:10px">${heat()}</div></div>
+ <div class="g c2">${S.goals.map(g=>{const p=goalProg(g);return`<div class="card"><b>${p.name}</b><div class="bar" style="margin:10px 0"><i style="width:${p.pct}%"></i></div><small>${p.c} / ${g.target} ${p.unit} · ${p.pct}% ${p.pct>=100?"✅":""}</small><button class="chip" data-a="delgoal" data-v="${g.id}">ลบ</button></div>`}).join("")||'<div class="empty">ยังไม่มีเป้าหมาย</div>'}</div>`},
+ach(){return`<h2>Achievements</h2><div class="g c4">${ACH.map(a=>{const u=S.ach.includes(a[0]);return`<div class="card ${u?"":"lock"}"><div style="font-size:34px">${a[1]}</div><b>${a[2]}</b><small>${a[3]}</small>${u?"✓ Unlocked":"🔒"}</div>`}).join("")}</div>`},
+ins(){const ss=S.sessions;if(ss.length<3)return"<h2>My Insights</h2>"+empty;const dm={};ss.forEach(s=>dm[s.date]=(dm[s.date]||0)+s.dur);const e=Object.entries(dm).sort((a,b)=>b[1]-a[1]),st=streaks();
+ return`<h2>My Insights</h2><div class="g c4">${card("วันที่อ่านมากที่สุด",e[0][0],`<small>${fm(e[0][1])}</small>`)}${card("วันที่อ่านน้อยที่สุด",e[e.length-1][0],`<small>${fm(e[e.length-1][1])}</small>`)}${card("วิชาที่อ่านมากที่สุด",agg(ss)[0][0])}${card("Total Hours",(sum(ss,s=>s.dur)/60).toFixed(1)+"h")}${card("Total Pages",sum(ss,s=>s.pages))}${card("Longest Session",fm(Math.max(...ss.map(s=>s.dur))))}${card("Streak",`${st.cur} / ${st.lg} days`)}${card("Goals Completed",S.goals.filter(g=>goalProg(g).pct>=100).length)}</div><div class="card" style="margin-top:14px"><h3>Reading Insights</h3>${insights().map(t=>`<p>💡 ${t}</p>`).join("")}</div>`},
+set(){return`<h2>Settings</h2><div class="card"><div class="row"><button class="btn s" data-a="theme" data-v="light">☀️ Light</button><button class="btn s" data-a="theme" data-v="dark">🌙 Dark</button><button class="btn s" data-a="theme" data-v="night">🌆 Night</button></div><button class="btn s" data-a="clear">ล้าง Demo Data</button> <button class="btn s" data-a="wipe">ลบข้อมูลทั้งหมด</button></div>`}};
+function render(){COLS=document.documentElement.dataset.theme==="night"?COLS_N:COLS_D;nav();try{$("#main").innerHTML=V_[V]()}catch(e){$("#main").innerHTML='<div class="card empty">เกิดข้อผิดพลาด: '+e.message+'</div>'}}
+// ===== timer =====
+const T={mode:"focus",state:"idle",acc:0,t0:0,custom:25,subject:"Mathematics",book:"",start:0,iv:0};
+const target=()=>T.mode==="short"?300:T.mode==="long"?900:T.mode==="custom"?T.custom*60:0;
+const el=()=>(T.acc+(T.state==="running"?(Date.now()-T.t0)/1000:0));
+function clk(){let s=Math.floor(target()?Math.max(0,target()-el()):el());return[Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(n=>String(n).padStart(2,"0")).join(":")}
+function tick(){const c=$("#clk");if(c)c.textContent=clk();const f=$("#fclk");if(f)f.textContent=clk();
+ if(target()&&T.state==="running"&&el()>=target()){finish()}}
+function finish(){clearInterval(T.iv);T.iv=0;const d=Math.max(1,Math.round(el()/60));T.state="idle";$("#focus")&&$("#focus").remove();
+ if(T.mode==="focus"||T.mode==="custom")summary(d);else{toast("☕ หมดเวลาพัก");T.acc=0;render()}}
+function focusUI(){let f=$("#focus");if(!f){f=document.createElement("div");f.id="focus";document.body.append(f)}
+ f.innerHTML=`<div style="opacity:.7">${T.subject||"Reading"}</div><h2 style="margin:0">${T.book||"Focus Mode"}</h2><div class="clock" id="fclk">${clk()}</div><div class="bar" style="width:min(320px,80vw)"><i style="width:${target()?Math.min(100,el()/target()*100):50}%"></i></div><div class="row" style="margin-top:16px"><button class="btn s" data-a="pause">${T.state==="paused"?"Resume":"Pause"}</button><button class="btn" data-a="stop">Stop</button></div>`}
+function summary(d){const bk=S.books.map(b=>`<option ${b.title===T.book?"selected":""}>${b.title}</option>`).join("");
+ $("#ov").innerHTML=`<div class="modal"><div><h3>Session Summary</h3><label>วิชา</label><input id="ssub" value="${T.subject}"><label>หนังสือ</label><select id="sbk"><option value="">–</option>${bk}</select><label>หัวข้อ</label><input id="stp"><label>เวลาอ่าน (นาที)</label><input id="sdu" type="number" value="${d}"><label>จำนวนหน้าที่อ่าน</label><input id="spg" type="number" value="0"><label>Focus Score (1–5)</label><select id="sfc">${[5,4,3,2,1].map(n=>`<option value="${n}">${"⭐".repeat(n)}</option>`).join("")}</select><label>ความรู้สึกหลังอ่าน</label><select id="smd"><option>😊</option><option>😐</option><option>😫</option><option>🤩</option></select><label>Note</label><textarea id="snt" rows="2"></textarea><div class="row"><button class="btn" data-a="save">Save</button><button class="btn s" data-a="discard">ทิ้ง</button></div></div></div>`}
+// ===== events =====
+document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a,v=b.dataset.v,g=id=>$("#"+id)&&$("#"+id).value;
+ if(a==="go"){V=v;render();scrollTo(0,0)}
+ else if(a==="rg"){RG=+v;render()}
+ else if(a==="mode"&&T.state==="idle"){T.mode=v;T.acc=0;render()}
+ else if(a==="start"){T.subject=g("tsub")||"General";T.book=g("tbk")||"";if(T.mode==="custom")T.custom=Math.max(1,+g("cm")||25);T.state="running";T.t0=Date.now();T.start=T.start||Date.now();T.iv=setInterval(tick,500);focusUI()}
+ else if(a==="pause"){if(T.state==="running"){T.acc=el();T.state="paused"}else{T.t0=Date.now();T.state="running"}focusUI();render()}
+ else if(a==="stop"){finish()}
+ else if(a==="reset"){clearInterval(T.iv);T.state="idle";T.acc=0;T.start=0;$("#focus")&&$("#focus").remove();render()}
+ else if(a==="save"){const d=Math.max(1,+g("sdu")||1),pg=Math.max(0,+g("spg")||0),bt=g("sbk"),now=Date.now();
+  S.sessions.push({id:"s"+now,date:dk(now),start:now-d*6e4,end:now,dur:d,subject:g("ssub")||"General",book:bt,topic:g("stp"),pages:pg,focus:+g("sfc"),mood:g("smd"),note:g("snt")});
+  const bk=S.books.find(x=>x.title===bt);if(bk)bk.last=Math.min(bk.total,bk.last+pg);
+  T.acc=0;T.start=0;checkAch();persist();$("#ov").innerHTML="";toast("✅ บันทึก Session แล้ว");V="dash";render()}
+ else if(a==="discard"){$("#ov").innerHTML="";T.acc=0;T.start=0;render()}
+ else if(a==="addbook"){const t=g("bt").trim(),n=+g("bn");if(!t||!n)return toast("กรอกชื่อและจำนวนหน้า");S.books.push({id:"b"+Date.now(),title:t,author:g("ba"),subject:g("bs")||"General",cat:g("bc"),total:n,last:+g("bl")||0});persist();render()}
+ else if(a==="delbook"){S.books=S.books.filter(x=>x.id!==v);persist();render()}
+ else if(a==="addgoal"){const t=g("gt"),n=+g("gv");if(!n)return;S.goals.push({id:"g"+Date.now(),type:t,target:n,subject:g("gs")||"General"});checkAch();persist();render()}
+ else if(a==="delgoal"){S.goals=S.goals.filter(x=>x.id!==v);persist();render()}
+ else if(a==="clear"){S.sessions=S.sessions.filter(s=>!s.demo);S.books=S.books.filter(b=>b.author!=="Demo");S.demo=false;S.ach=[];persist();toast("ล้าง Demo Data แล้ว");render()}
+ else if(a==="wipe"){S.sessions=[];S.books=[];S.goals=[];S.ach=[];S.demo=false;persist();render()}
+ else if(a==="night"){const cur=document.documentElement.dataset.theme,n=cur==="night"?(S.prev||"dark"):"night";if(cur!=="night")S.prev=cur||"dark";S.theme=n;document.documentElement.dataset.theme=n;persist();render()}
+ else if(a==="theme"){S.theme=v;document.documentElement.dataset.theme=v;persist();render()}});
+document.addEventListener("input",e=>{const i=e.target.id;if(i==="fq"||i==="fs"||i==="ff"){F.q=$("#fq").value;F.sub=$("#fs").value;F.foc=$("#ff").value;const p=e.target.selectionStart;render();const n=$("#"+i);n.focus();try{n.setSelectionRange(p,p)}catch(x){}}});
+if(S.theme)document.documentElement.dataset.theme=S.theme;
+// ===== HERO (logic ported from scroll-locked-video-hero.tsx) =====
+(function(){const sec=$("#hero"),video=$("#hv");$("#hT").textContent=HERO.title;$("#hG").textContent=HERO.tagline;$("#hHt").textContent=HERO.scrollHint;
+ $("#sig").innerHTML=`by <a href="${HERO.signature.url}" style="color:inherit;text-decoration:none">${HERO.signature.name}</a>`;
+ const rm=matchMedia("(prefers-reduced-motion: reduce)").matches;let dur=0,raf=0,tp=0,cp=0,started=false,seeking=false,pend=null,locked=false,ly=0,ty=0,done=false;
+ video.src=HERO.videoSrc;const ready=()=>{video.style.opacity=1};
+ video.addEventListener("loadeddata",()=>{dur=video.duration||0;ready();if(rm)video.currentTime=dur*.92});video.addEventListener("error",()=>{});
+ const p=video.play&&video.play();if(p&&p.then)p.then(()=>video.pause()).catch(()=>{});
+ video.addEventListener("seeked",()=>{seeking=false;if(pend!==null){const t=pend;pend=null;seeking=true;video.currentTime=t}});
+ const seek=t=>{if(seeking){pend=t;return}seeking=true;video.currentTime=t};
+ function lock(){if(locked)return;locked=true;ly=scrollY;const b=document.body.style;Object.assign(b,{position:"fixed",top:`-${ly}px`,left:"0",right:"0",width:"100%",overscrollBehavior:"none"})}
+ function release(){if(!locked)return;locked=false;const b=document.body.style;["position","top","left","right","width","overscrollBehavior"].forEach(k=>b[k]="");scrollTo(0,ly)}
+ function leave(){if(done)return;done=true;cancelAnimationFrame(raf);release();window.removeEventListener("wheel",wh);window.removeEventListener("touchmove",tm);window.removeEventListener("touchstart",ts);sec.style.display="none";scrollTo(0,0);render()}
+ // ทางออก: scroll ต่อเมื่อวิดีโอจบ (ไม่ติด hero) หรือกด Skip / กด Enter / Esc
+ let extra=0;function add(d){if(tp>=.999&&d>0){extra+=d;if(extra>200)leave();return}extra=0;tp=clamp(tp+d/HERO.scrubDistance,0,1);if(tp>.001)started=true}
+ const wh=e=>{add(e.deltaY);e.preventDefault()},ts=e=>{ty=e.touches[0]?.clientY??0},tm=e=>{const y=e.touches[0]?.clientY??ty;add(ty-y);ty=y;e.preventDefault()};
+ const kd=e=>{if(done)return;if(e.key==="Enter"||e.key==="Escape")leave();if(e.key==="ArrowDown"||e.key===" "||e.key==="PageDown"){add(300);e.preventDefault()}if(e.key==="ArrowUp"||e.key==="PageUp"){add(-300);e.preventDefault()}};
+ addEventListener("keydown",kd);$("#skip").onclick=leave;
+ if(rm){leave();return}
+ lock();addEventListener("wheel",wh,{passive:false});addEventListener("touchstart",ts,{passive:true});addEventListener("touchmove",tm,{passive:false});
+ const q=(id)=>$("#"+id);
+ function frame(){cp+=(tp-cp)*.18;if(dur>0)seek(cp*dur);video.style.transform=`scale(${1+cp*.06})`;
+  const t=1-clamp(cp/.35,0,1),T_=q("hT");T_.style.opacity=t;T_.style.transform=`translateY(${(1-t)*-24}px) scale(${.96+t*.04})`;T_.style.filter=`blur(${(1-t)*10}px)`;
+  q("hH").style.opacity=started?0:1;const u=clamp((cp-.82)/.18,0,1),G=q("hG");G.style.opacity=u;G.style.transform=`translateY(${(1-u)*20}px) scale(${.97+u*.03})`;G.style.filter=`blur(${(1-u)*8}px)`;
+  q("hPi").style.transform=`scaleX(${cp})`;raf=requestAnimationFrame(frame)}
+ raf=requestAnimationFrame(frame);})();
+render();
+</script></body></html>
