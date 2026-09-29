@@ -17,7 +17,10 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,Bli
 #hP{position:absolute;left:0;right:0;bottom:0;height:2px;background:#ffffff1f}#hPi{height:100%;background:#fff;transform:scaleX(0);transform-origin:left}
 #skip{position:absolute;top:calc(16px + env(safe-area-inset-top,0px));right:16px;z-index:3;background:#ffffff22;color:#fff;border:1px solid #ffffff44;border-radius:99px;padding:8px 16px;cursor:pointer;backdrop-filter:blur(8px)}
 #sig{position:absolute;right:16px;bottom:12px;font-size:12px;color:#dce0e899}
-#app{display:flex;min-height:100dvh}
+#hero{transition:opacity .7s ease}
+#app{display:flex;min-height:100dvh;opacity:0;transition:opacity .8s ease}
+#app.in{opacity:1}
+@media(prefers-reduced-motion:reduce){#hero,#app{transition:none}}
 nav{width:220px;padding:20px 12px;border-right:1px solid var(--bd);position:sticky;top:0;height:100dvh;background:var(--card);backdrop-filter:blur(14px);display:flex;flex-direction:column;gap:4px}
 nav b{font-size:20px;padding:6px 12px 16px;background:linear-gradient(90deg,var(--pr),var(--pr2));-webkit-background-clip:text;color:transparent}
 nav button{all:unset;cursor:pointer;padding:10px 12px;border-radius:12px;color:var(--mu);font-size:14px}
@@ -85,7 +88,7 @@ nav button:hover,nav button.on{border-color:var(--glass-bd);background:linear-gr
 <div id="toast"></div><div id="ov"></div>
 <script>
 // ===== CONFIG (เปลี่ยน video/ข้อความได้ที่นี่ที่เดียว) =====
-const HERO={videoSrc:"https://cdn.21st.dev/assets/mirror/21/21a77eac28eacbb7e142016eefeaa0b4a766619e51113629a3bc6df6af066c0f.mp4",title:"READ. FOCUS. GROW.",scrollHint:"START READING",tagline:"",signature:{name:"ReadTrack",url:"#"},scrubDistance:3200};
+const HERO={videoSrc:"https://cdn.21st.dev/assets/mirror/21/21a77eac28eacbb7e142016eefeaa0b4a766619e51113629a3bc6df6af066c0f.mp4",title:"READ. FOCUS. GROW.",scrollHint:"START READING",tagline:"ทุกนาทีที่อ่าน คือการพัฒนาตัวเอง",signature:{name:"ReadTrack",url:"#"},scrubDistance:3200};
 const $=s=>document.querySelector(s),clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 // ===== storage =====
 const K="readtrack.v1";let mem=null;
@@ -228,7 +231,11 @@ if(S.theme)document.documentElement.dataset.theme=S.theme;
  const seek=t=>{if(seeking){pend=t;return}seeking=true;video.currentTime=t};
  function lock(){if(locked)return;locked=true;ly=scrollY;const b=document.body.style;Object.assign(b,{position:"fixed",top:`-${ly}px`,left:"0",right:"0",width:"100%",overscrollBehavior:"none"})}
  function release(){if(!locked)return;locked=false;const b=document.body.style;["position","top","left","right","width","overscrollBehavior"].forEach(k=>b[k]="");scrollTo(0,ly)}
- function leave(){if(done)return;done=true;cancelAnimationFrame(raf);release();window.removeEventListener("wheel",wh);window.removeEventListener("touchmove",tm);window.removeEventListener("touchstart",ts);sec.style.display="none";scrollTo(0,0);render()}
+ function leave(){if(done)return;done=true;cancelAnimationFrame(raf);release();window.removeEventListener("wheel",wh);window.removeEventListener("touchmove",tm);window.removeEventListener("touchstart",ts);
+  scrollTo(0,0);render();const app=$("#app");
+  requestAnimationFrame(()=>app.classList.add("in")); // ค่อยๆ Fade-in Dashboard
+  sec.style.opacity="0"; // ค่อยๆ Fade-out Hero
+  setTimeout(()=>{sec.style.display="none"},rm?0:700)}
  // ทางออก: scroll ต่อเมื่อวิดีโอจบ (ไม่ติด hero) หรือกด Skip / กด Enter / Esc
  let extra=0;function add(d){if(tp>=.999&&d>0){extra+=d;if(extra>200)leave();return}extra=0;tp=clamp(tp+d/HERO.scrubDistance,0,1);if(tp>.001)started=true}
  const wh=e=>{add(e.deltaY);e.preventDefault()},ts=e=>{ty=e.touches[0]?.clientY??0},tm=e=>{const y=e.touches[0]?.clientY??ty;add(ty-y);ty=y;e.preventDefault()};
